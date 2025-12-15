@@ -25,6 +25,19 @@ def run_chain(question):
     chat_history.add_ai_message(response)
     return response
 
+#interactive CLI Chatbot
+print("\n AI chatbot with Memory")
+print("Type 'exit' to quit.\n ")
+while True:
+    user_input = input("You: ")
+    if user_input.lower() == 'exit':
+        print("Goodbye!")
+        break
+    ai_responce = run_chain(user_input)
+    print("AI:", ai_responce)
+
+
+
 
 
 
