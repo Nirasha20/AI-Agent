@@ -12,11 +12,19 @@ if "chat_history" not in st.session_state:
 #Define AI chat prompt template
 prompt = PromptTemplate(
     input_variables=["chat_history", "question"],
-    template="Previous conversation:\n{chat_history}\n\nUser question: {question}\nAI:",
+    template="""You are a helpful AI assistant. Use the previous conversation context to provide relevant responses.
+
+Previous conversation:
+{chat_history}
+
+User: {question}
+AI Assistant:""",
 )    
 #Function to run AI chat with memory
 def run_chain(question):
-    chat_history_text = "\n".join([f"{msg.type.capitalize()}: {msg.content}" for msg in st.session_state.chat_history.messages])
+    #Retrieve chat history
+    chat_history_text ="\n".join([f"{msg.type.capitalize()}: {msg.content}" for msg in st.session_state.chat_history.messages])
+
 
     #Run the AI Responce generation
     response = llm.invoke(prompt.format(chat_history=chat_history_text, question=question))
@@ -26,19 +34,94 @@ def run_chain(question):
     st.session_state.chat_history.add_ai_message(response)
     return response
 
+
 # Streamlit UI
-st.title("AI Chatbot with Memory")
-st.write("Ask me anything! ")
+st.set_page_config(page_title="AI Chatbot", page_icon="🤖", layout="wide")
 
-user_input = st.text_input("Your question: ", "")
-if user_input:
-    response = run_chain(user_input)
-    st.write(f"AI: {response}")
+# Custom CSS for better styling
+st.markdown("""
+    <style>
+    .main-title {
+        text-align: center;
+        color: #4A90E2;
+        font-size: 3em;
+        margin-bottom: 0.5em;
+    }
+    .user-msg {
+        background-color: #E3F2FD;
+        padding: 15px;
+        border-radius: 15px;
+        margin: 10px 0;
+        border-left: 5px solid #2196F3;
+    }
+    .ai-msg {
+        background-color: #F5F5F5;
+        padding: 15px;
+        border-radius: 15px;
+        margin: 10px 0;
+        border-left: 5px solid #4CAF50;
+    }
+    .stTextInput > div > div > input {
+        font-size: 16px;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
-#Show full chat history
-st.subheader("Chat History")
+# Sidebar
+with st.sidebar:
+    st.header("ℹ️ About")
+    st.write("This AI chatbot remembers your conversation history and provides contextual responses.")
+    st.write("**Model:** llama3.2:1b")
+    st.write("**Features:**")
+    st.write("✓ Conversation memory")
+    st.write("✓ Context-aware responses")
+    st.write("✓ Chat history tracking")
+    
+    if st.button("🗑️ Clear Chat History", use_container_width=True):
+        st.session_state.chat_history = ChatMessageHistory()
+        st.rerun()
+
+# Main title
+st.markdown('<h1 class="main-title">🤖 AI Chatbot Assistant</h1>', unsafe_allow_html=True)
+st.markdown("---")
+
+# Chat container
+chat_container = st.container()
+
+with chat_container:
+    if len(st.session_state.chat_history.messages) == 0:
+        st.info("👋 Hello! I'm your AI assistant. Ask me anything to get started!")
+    else:
+        for msg in st.session_state.chat_history.messages:
+            if msg.type == "human":
+                st.markdown(f'<div class="user-msg">👤 <strong>You:</strong><br>{msg.content}</div>', unsafe_allow_html=True)
+            else:
+                st.markdown(f'<div class="ai-msg">🤖 <strong>AI:</strong><br>{msg.content}</div>', unsafe_allow_html=True)
+
+# Input section at bottom
+st.markdown("---")
+
+# Use a form to prevent continuous submission
+with st.form(key="chat_form", clear_on_submit=True):
+    col1, col2 = st.columns([6, 1])
+    
+    with col1:
+        user_input = st.text_input("💬 Type your message here:", "", key="user_input", label_visibility="collapsed", placeholder="Type your question and press Enter...")
+    
+    with col2:
+        send_button = st.form_submit_button("Send 📤", use_container_width=True)
+
+if send_button and user_input:
+    with st.spinner("🤔 Thinking..."):
+        response = run_chain(user_input)
+        st.rerun()     
+
+# Show full chat history
+st.subheader("📜 Chat History")
 for msg in st.session_state.chat_history.messages:
-    st.write(f"**{msg.type.capitalize()}:** {msg.content}")    
+    st.write(f"**{msg.type.capitalize()}**: {msg.content}")
+
+
 
 
 
