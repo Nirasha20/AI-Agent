@@ -1,4 +1,3 @@
-
 # AI-Agent
 
 A multi-modal AI assistant implemented in Python. This repository combines chat, memory, document Q&A, web scraping, vector search (FAISS), and voice I/O, and includes both CLI and Streamlit UI components.
@@ -38,7 +37,7 @@ AI-Agent is a modular Python toolkit that provides:
 - Web scraping pipeline with vector indexing (FAISS) for retrieval-augmented generation (RAG).
 - Document (PDF) ingestion, summarization, and Q&A.
 
-The project appears intended to be flexible: it can use local or hosted LLMs (commit history references a model update to `llama3.2:1b`) and uses FAISS for vector retrieval.
+The project is flexible: it can use local or hosted LLMs (commit history references a model update to `llama3.2:1b`) and uses FAISS for vector retrieval.
 
 ---
 
@@ -82,9 +81,9 @@ The project appears intended to be flexible: it can use local or hosted LLMs (co
   PDF/document ingestion, chunking, summarization, and Q&A capabilities.
 
 - `README.md`  
-  (This file — expanded to provide detailed instructions.)
+  This file.
 
-Note: If you add or maintain files like `requirements.txt`, `.env.example`, Dockerfiles, or CI configs, list them here and update this section.
+Note: Add `requirements.txt`, `.env.example`, Dockerfiles, or CI configs as needed.
 
 ---
 
@@ -161,7 +160,7 @@ pip install -r requirements.txt
   python ai_document_reader.py --pdf path/to/document.pdf
   ```
 
-Commands above assume these scripts expose a runnable CLI; if not, check the top of each file for entrypoint functions or run as modules.
+Commands above assume these scripts expose a runnable CLI; if not, inspect each script for entry points and adapt commands.
 
 ---
 
@@ -253,15 +252,15 @@ Replace flags above with the actual flags used in each file. Inspect each script
 
 - Audio device issues:
   - Ensure microphone drivers are installed and accessible.
-  - On Windows, install `PyAudio` (often requires prebuilt wheels) or use `sounddevice`.
+  - On Windows, installing `PyAudio` may require prebuilt wheels or use `sounddevice`.
   - If STT fails or is noisy, increase `pause_threshold` or use platform-specific enhancements.
 
 - TTS issues:
   - `pyttsx3` works offline but may require platform-specific backends; `gTTS` requires network access.
-  - Reinitialize the TTS engine on errors (the repository has improved error handling for this).
+  - Reinitialize the TTS engine on errors (the repository includes improved error handling for this).
 
 - FAISS:
-  - Use `faiss-cpu` for CPU-only setups; `faiss-gpu` if running large indexes on GPU.
+  - Use `faiss-cpu` for CPU-only setups; `faiss-gpu` for GPU acceleration.
   - Save & load indices using the configured `FAISS_INDEX_PATH` or persistence directory.
 
 - Local LLMs:
@@ -304,14 +303,3 @@ No license is specified in the repository metadata. If you are the repository ow
 ## Acknowledgements
 
 This project leverages common open-source building blocks for RAG systems, speech, document parsing, and UI. If you reuse any third-party models or libraries, please follow their licensing and attribution requirements.
-
----
-
-If you'd like, I can:
-- Convert this README into the repository's README.md file content,
-- Generate a `requirements.txt` by scanning imports,
-- Produce a `.env.example` with the environment variables referenced above.
-
-(End of README)
- 
- 
