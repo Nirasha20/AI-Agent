@@ -12,17 +12,22 @@ llm = OllamaLLM(model="llama3.2:1b")
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = ChatMessageHistory()
 
-#Initialize text-to-speech engines
-engine = pyttsx3.init()
-engine.setProperty('rate', 160)  # Set speaking rate 
-
 #speech Recognition
 recognizer = sr.Recognizer()
 
 #Function to Speak AI responce
 def speak(text):
-    engine.say(text)
-    engine.runAndWait()
+    try:
+        # Initialize engine fresh each time to avoid threading issues with Streamlit
+        engine = pyttsx3.init()
+        engine.setProperty('rate', 160)  # Set speaking rate
+        engine.say(text)
+        engine.runAndWait()
+        engine.stop()
+    except Exception as e:
+        st.warning(f"⚠️ Text-to-speech failed: {str(e)}")
+        # Fallback: just display the text
+        pass
 
 #Function to listen to voice input
 def listen():
