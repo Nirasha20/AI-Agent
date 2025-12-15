@@ -58,20 +58,104 @@ def run_chain(question):
     st.session_state.chat_history.add_ai_message(response)
     return response
 
-#Streamlit web Ui
-st.title("🤖AI Voice Assistant with Memory")
-st.write("Click the button and speak to the AI voice assistant.")
+#Streamlit web UI
+st.set_page_config(page_title="AI Voice Assistant", page_icon="🎤", layout="wide")
 
-#Button to start voice interaction 
-if st.button("Start Talking"):
-    user_query = listen()
-    if user_query:
-        ai_response = run_chain(user_query)
-        st.write(f"**You**: {user_query}")
-        st.write(f"**AI**: {ai_response}")
-        speak(ai_response) 
+# Custom CSS for better styling
+st.markdown("""
+    <style>
+    .main-title {
+        text-align: center;
+        color: #9C27B0;
+        font-size: 3em;
+        margin-bottom: 0.3em;
+    }
+    .subtitle {
+        text-align: center;
+        color: #666;
+        font-size: 1.2em;
+        margin-bottom: 2em;
+    }
+    .user-msg {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 20px;
+        margin: 15px 0;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .ai-msg {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 20px;
+        margin: 15px 0;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .stButton>button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-size: 20px;
+        font-weight: bold;
+        padding: 20px 50px;
+        border-radius: 50px;
+        border: none;
+        box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        transition: all 0.3s;
+    }
+    .stButton>button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 20px rgba(0,0,0,0.3);
+    }
+    </style>
+""", unsafe_allow_html=True)
 
-#Display chat history
-st.subheader("Chat History")
-for msg in st.session_state.chat_history.messages:
-    st.write(f"**{msg.type.capitalize()}**: {msg.content}")        
+# Sidebar
+with st.sidebar:
+    st.header("🎙️ Voice Assistant Info")
+    st.write("**How to use:**")
+    st.write("1. Click 'Start Talking' button")
+    st.write("2. Speak your question clearly")
+    st.write("3. Wait for AI response")
+    st.write("4. Listen to the answer")
+    st.markdown("---")
+    st.write("**Model:** llama3.2:1b")
+    st.write("**Features:**")
+    st.write("🎤 Voice Input")
+    st.write("🔊 Voice Output")
+    st.write("💾 Conversation Memory")
+    st.write("🧠 Context Awareness")
+    
+    if st.button("🗑️ Clear All History", use_container_width=True):
+        st.session_state.chat_history = ChatMessageHistory()
+        st.rerun()
+
+# Main title
+st.markdown('<h1 class="main-title">🎤 AI Voice Assistant</h1>', unsafe_allow_html=True)
+st.markdown('<p class="subtitle">Speak naturally and get intelligent voice responses</p>', unsafe_allow_html=True)
+st.markdown("---")
+
+# Voice interaction section
+col1, col2, col3 = st.columns([1, 2, 1])
+with col2:
+    if st.button("🎙️ Start Talking", use_container_width=True):
+        user_query = listen()
+        if user_query:
+            with st.spinner("🤔 Processing your question..."):
+                ai_response = run_chain(user_query)
+            st.success("✅ Response ready!")
+            speak(ai_response)
+
+st.markdown("---")
+
+# Display conversation history with styled messages
+st.markdown("### 💬 Conversation History")
+
+if len(st.session_state.chat_history.messages) == 0:
+    st.info("🎙️ No conversations yet. Click 'Start Talking' to begin!")
+else:
+    for msg in st.session_state.chat_history.messages:
+        if msg.type == "human":
+            st.markdown(f'<div class="user-msg">👤 <strong>You said:</strong><br>{msg.content}</div>', unsafe_allow_html=True)
+        else:
+            st.markdown(f'<div class="ai-msg">🤖 <strong>AI responded:</strong><br>{msg.content}</div>', unsafe_allow_html=True)        
